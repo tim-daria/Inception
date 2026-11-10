@@ -1,0 +1,23 @@
+networks:
+
+volumes:
+
+services:
+  mariadb:
+    build: path
+    networks:
+      -
+    volumes:
+      -
+  wordpress:
+    build: path
+    networks:
+      -
+    volumes:
+      -
+  nginx:
+    build: path
+    networks:
+      -
+    volumes:
+      -
