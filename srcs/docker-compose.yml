@@ -1,23 +1,82 @@
 networks:
+  internal-network:
+    driver: bridge
 
 volumes:
+  mariadb-data:
+    driver: local
+    driver_opts:
+      type: none
+      device: ${DATA_DIR:-/home/dtimofee/data}/mariadb
+      o: bind
+  wordpress-data:
+    driver: local
+    driver_opts:
+      type: none
+      device: ${DATA_DIR:-/home/dtimofee/data}/wordpress
+      o: bind
+
+secrets:
+  db_password:
+    file: ../secrets/db_password.txt
+  db_root_password:
+    file: ../secrets/db_root_password.txt
+  wp_admin_password:
+    file: ../secrets/admin_password.txt
+  wp_user_password:
+    file: ../secrets/user_password.txt
 
 services:
   mariadb:
-    build: path
+    image: mariadb:1.0
+    build: requirements/mariadb
+    container_name: mariadb
+    restart: unless-stopped
+    environment:
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
     networks:
-      -
+      - internal-network
     volumes:
-      -
+      - "mariadb-data:/var/lib/mysql"
+    secrets:
+      - db_password
+      - db_root_password
   wordpress:
-    build: path
+    image: wordpress:1.0
+    build: requirements/wordpress
+    container_name: wordpress
+    restart: unless-stopped
+    environment:
+      MYSQL_HOST: ${MYSQL_HOST}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      DOMAIN_NAME: ${DOMAIN_NAME}
+      WP_TITLE: ${WP_TITLE}
+      WP_ADMIN_USER: ${WP_ADMIN_USER}
+      WP_ADMIN_EMAIL: ${WP_ADMIN_EMAIL}
+      WP_USER: ${WP_USER}
+      WP_USER_EMAIL: ${WP_USER_EMAIL}
     networks:
-      -
+      - internal-network
     volumes:
-      -
+      - "wordpress-data:/var/www/html"
+    secrets:
+      - db_password
+      - wp_admin_password
+      - wp_user_password
   nginx:
-    build: path
+    image: nginx:1.0
+    build: requirements/nginx
+    container_name: nginx
+    restart: unless-stopped
+    environment:
+      DOMAIN_NAME: ${DOMAIN_NAME}
     networks:
-      -
+      - internal-network
     volumes:
-      -
+      - "wordpress-data:/var/www/html"
+    ports:
+      - "443:443"
+    depends_on:
+      - wordpress
