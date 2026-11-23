@@ -1,13 +1,15 @@
 COMPOSE_FILE = srcs/docker-compose.yml
-DATA_DIR ?= /home/dtimofee/data
-
+export DATA_DIR ?= $(HOME)/data
 .PHONY: all start stop down fclean re
 
 all: start
 
-start:
+start: build
 	mkdir -p $(DATA_DIR)/mariadb $(DATA_DIR)/wordpress
-	@docker compose -f "$(COMPOSE_FILE)" up -d --build
+	@docker compose -f "$(COMPOSE_FILE)" up -d
+
+build:
+	@docker compose -f "$(COMPOSE_FILE)" build
 
 stop:
 	@docker compose -f "$(COMPOSE_FILE)" stop

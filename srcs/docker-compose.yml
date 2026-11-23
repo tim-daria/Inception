@@ -7,13 +7,13 @@ volumes:
     driver: local
     driver_opts:
       type: none
-      device: ${DATA_DIR:-/home/dtimofee/data}/mariadb
+      device: ${DATA_DIR:-$HOME/data}/mariadb
       o: bind
   wordpress-data:
     driver: local
     driver_opts:
       type: none
-      device: ${DATA_DIR:-/home/dtimofee/data}/wordpress
+      device: ${DATA_DIR:-$HOME/data}/wordpress
       o: bind
 
 secrets:
