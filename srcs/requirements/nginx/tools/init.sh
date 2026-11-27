@@ -10,7 +10,9 @@ if [ ! -f /etc/nginx/ssl/nginx.crt ]; then
         -subj "/CN=${DOMAIN_NAME}"
 fi
 
-sed "s/DOMAIN_NAME/${DOMAIN_NAME}/g" /etc/nginx/site.template \
+sed -e "s/DOMAIN_NAME/${DOMAIN_NAME}/g" \
+    -e "s/NGINX_PORT/${NGINX_PORT:-443}/g" \
+    -e "s/WP_PORT/${WP_PORT:-9000}/g" /etc/nginx/site.template \
     > /etc/nginx/conf.d/site.conf
 
 exec nginx -g "daemon off;"
