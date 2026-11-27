@@ -62,17 +62,15 @@ Inception/
   - `nginx/tools/init.sh` — generates a self-signed TLS certificate for `DOMAIN_NAME` and renders `site.conf` from the template.
 - To rebuild after changing a Dockerfile or an init script: `make build` (or `make re` for a full reset).
 
-### Custom port (optional)
+### Custom ports (optional)
 
-The site is served on **443** by default, as the subject expects. To use another port (e.g. 543, if 443 is taken on the machine), set `NGINX_PORT=543` in `srcs/.env`. That single variable drives all three places that must stay in sync:
+Two ports can be reconfigured from `srcs/.env`; both default to the subject-standard values:
 
-| Where | What it controls |
-|---|---|
-| `docker-compose.yml` (`ports`) | host port published → container port |
-| nginx `site.template` (`listen`) | the port nginx actually listens on |
-| WordPress `siteurl`/`home` | so WP does not redirect visitors to 443 |
-
-After changing it run `make re` (the WordPress URL is set at install time). Without `NGINX_PORT` everything defaults to 443.
+| Variable | Default | What it drives |
+|---|---|---|
+| `NGINX_PORT` | `443` | the published host port, nginx `listen`, and the WordPress `siteurl`/`home` (so WP does not redirect visitors to the wrong port) |
+| `WP_PORT` | `9000` | the php-fpm listen port inside the WordPress container and nginx `fastcgi_pass` (internal only, never published to the host) |
+| `DB_PORT` | `3306` | the MariaDB listen port (`99-custom.cnf`) and the WordPress `DB_HOST` in `wp-config.php` (internal only) |
 
 ## Managing containers and volumes
 
